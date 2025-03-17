@@ -1,0 +1,47 @@
+= 我的理解
+[source]
+.dockerfile
+----
+FROM openjdk:8 as builder
+WORKDIR application
+ARG JAR_FILE=target/hsweb4-webflux-example-1.0-SNAPSHOT.jar
+COPY ${JAR_FILE} application.jar
+RUN java -Djarmode=layertools -jar application.jar extract
+
+FROM openjdk:8
+WORKDIR application
+COPY --from=builder application/dependencies/ ./
+COPY --from=builder application/snapshot-dependencies/ ./
+COPY --from=builder application/spring-boot-loader/ ./
+COPY --from=builder application/application/ ./
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+ENTRYPOINT ["./docker-entrypoint.sh"]
+----
+
+[source]
+.dockerfile
+----
+#!/bin/bash
+java $JAVA_OPTS -server \
+-XX:+UnlockExperimentalVMOptions \
+-XX:+UseCGroupMemoryLimitForHeap \
+-XX:-OmitStackTraceInFastThrow \
+-Djava.security.egd=file:/dev/./urandom \
+org.springframework.boot.loader.JarLauncher
+----
+- java $JAVA_OPTS -server
+
+设置jvm参数的环境变量，优化新能和稳定性
+
+- Djava.security.egd=file:/dev/./urandom
+
+https://www.cnblogs.com/mrzzzblog/p/15809789.html[详解]
+
+- org.springframework.boot.loader.JarLauncher
+启动springboot应用
+
+
+
+
+

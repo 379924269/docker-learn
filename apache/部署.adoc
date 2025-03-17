@@ -1,0 +1,6 @@
+= 部署
+
+== 构建镜像
+    docker build -t apache:ubuntu .
+
+== 运行镜像

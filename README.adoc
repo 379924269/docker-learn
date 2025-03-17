@@ -3,5 +3,7 @@
 == 参考资料网站
 https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/[adoc官网]
 
+https://www.runoob.com/docker/docker-install-nginx.html[docker 菜鸟教程]
+
 == 参考书籍
-《Docker技术入门与实战》
+《Docker技术入门与实战 第3版》

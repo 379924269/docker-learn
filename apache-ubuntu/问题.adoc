@@ -1,0 +1,42 @@
+= 要在Docker容器中启用SSH免密登录，你需要遵循以下步骤：
+
+1、首先，确保你的Docker容器已经安装了SSH服务。如果没有，你可以在Dockerfile中添加安装命令，或者在运行容器时使用docker exec命令安装。
+
+2、生成SSH密钥对。在你的主机上运行以下命令：
+
+[source,bash]
+.genkey.sh
+----
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+----
+
+这将生成一个公钥（默认为~/.ssh/id_rsa.pub）和一个私钥（默认为~/.ssh/id_rsa）。
+
+3、将公钥添加到Docker容器的authorized_keys文件中。你可以使用以下命令：
+
+[source,bash]
+.cp-authoriezd_keys.sh
+----
+cat ~/.ssh/id_rsa.pub | docker exec -i your_container_id /bin/bash -c "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys"
+----
+
+
+请将your_container_id替换为你的Docker容器ID。
+
+4、确保Docker容器中的SSH配置文件允许免密登录。编辑/etc/ssh/sshd_config文件，确保以下设置是启用的：
+[source]
+.sshd_config
+----
+PermitRootLogin yes
+PasswordAuthentication no
+----
+
+5、重启Docker容器中的SSH服务以应用更改：
+
+ docker exec your_container_id service ssh restart
+
+现在，你应该能够使用SSH免密登录到你的Docker容器。例如：
+
+root@47.109.142.20: Permission denied (publickey).root@47.109.142.20: Permission denied (publickey).    ssh -i ~/.ssh/id_rsa root@your_container_ip
+
+请将your_container_ip替换为你的Docker容器的IP地址。

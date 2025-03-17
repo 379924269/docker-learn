@@ -1,0 +1,26 @@
+version: '3.1'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: derper123
+      CONTAINER_TIMEZONE: Asia/Shanghai
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3309:3306
+
+  db-init:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: derper123
+      MYSQL_DATABASE: sperm
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: /bin/bash -c "mysql -u root -p'$$MYSQL_ROOT_PASSWORD' $$MYSQL_DATABASE < /docker-entrypoint-initdb.d/init.sql"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
